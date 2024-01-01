@@ -20,10 +20,28 @@ export const wasmExports = async () => {
     console.log('sub2(5):', sub2(5))
     console.log('sub2(4):', sub2(4))
     // 通过table间接调用
-    console.log('table.get(0):', table.get(0)(1, 2))
+    console.log('table.get(0)(1, 2):', table.get(0)(1, 2))
     // 使用内存数据
-    console.log('showString:', showString(memory.buffer, 0, 13))
-  } catch (error) {}
+    console.log('showString:', showString(memory.buffer, 0, 11))
+    // js 在内存中写入数据
+    let bytes = new Uint8Array(memory.buffer, 7, 8)
+    const textEncoder = new TextEncoder()
+    '我是js'
+      .split('')
+      .map((v, i) => {
+        return textEncoder.encode(v)
+      })
+      .reduce((acc, v) => {
+        acc.push(...v)
+        return acc
+      }, [])
+      .forEach((v, i) => {
+        bytes[i] = v
+      })
+    console.log('写入后showString:', showString(memory.buffer, 0, 15))
+  } catch (error) {
+    console.log('=-0099')
+  }
 }
 
 const h2Show = (buffer, offset, length) => {
@@ -42,10 +60,10 @@ export const wasmImport = async () => {
   let table = new WebAssembly.Table({ initial: 2, element: 'anyfunc' })
   let importObj = {
     env: {
-      // console: (val) => {
-      //   console.log(val)
-      // },
-      console:console.log,
+      console: (...args) => {
+        console.log(args)
+      },
+      // console: console.log,
       memory,
       table,
     },
@@ -55,11 +73,12 @@ export const wasmImport = async () => {
       '/public/wasm/importEx/hello.wasm',
       importObj
     )
-    let { add } = instance.exports
+    let { add, ws_log } = instance.exports
 
     console.log('==>>>instance', instance)
     // 调用函数
-    add(3,5)
+    add(3, 5)
+    ws_log()
   } catch (error) {}
 }
 
@@ -109,7 +128,7 @@ export const wasmTable = async () => {
     let { hello } = instance.exports
     // printStr(memory.buffer, 0, 18)
     // console.log('memory中数据', );
-    
+
     // 调用函数
     hello()
   } catch (error) {

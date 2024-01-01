@@ -40,3 +40,16 @@
 .read-the-docs {
   color: #888;
 }
+
+.canvas_top {
+  display: flex;
+  align-items: flex-center;
+  justify-content: center;
+  white-space: pre;
+  /* font-family: monospace; */
+  div:first-child {
+    margin-right: 100px;
+    display: flex;
+    flex-direction: column;
+  }
+}

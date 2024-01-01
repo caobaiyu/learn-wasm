@@ -3,6 +3,7 @@
   (data (i32.const 0) "你好,wasm")
   (table $tab 1 20 funcref)
   (elem (i32.const 0) $add )
+  (global $g1 (mut i32) (i32.const 99))
   (type $type_0 (func (param i32 i32) (result i32)))
   (func $add (type $type_0)
     local.get 0
